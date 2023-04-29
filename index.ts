@@ -26,7 +26,7 @@ const openai = new OpenAIApi(config)
 //   }
 // }
 
-await openai.createChatCompletion({
+openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: [
       { role: 'system', content: 'You\'re an useful assistant. Keep your answers as short and objective as possible' },
