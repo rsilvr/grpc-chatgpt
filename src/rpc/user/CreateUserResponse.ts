@@ -1,15 +1,14 @@
 // Original file: proto/user.proto
 
-import type { Long } from '@grpc/proto-loader';
 
 export interface CreateUserResponse {
   'userId'?: (string);
   'name'?: (string);
-  'createdAt'?: (number | string | Long);
+  'createdAt'?: (number | string);
 }
 
 export interface CreateUserResponse__Output {
   'userId': (string);
   'name': (string);
-  'createdAt': (string);
+  'createdAt': (number);
 }

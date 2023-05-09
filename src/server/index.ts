@@ -1,10 +1,10 @@
 import { Server, ServerCredentials, loadPackageDefinition } from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
-import { randomUUID } from 'crypto'
 import wrapServerWithReflection from 'grpc-node-server-reflection'
 import { join } from 'path'
 import { ProtoGrpcType as UserServiceDefinition } from '../rpc/user'
 import { UserServiceHandlers } from '../rpc/user/UserService'
+import { createUser } from './service/userService'
 // import { ProtoGrpcType as ChatService } from '../rpc/chat'
 
 const packageDefinition = protoLoader.loadSync(join(__dirname, '../../proto/user.proto'))
@@ -12,8 +12,9 @@ const userServiceDefinition = loadPackageDefinition(packageDefinition) as unknow
 
 const userServiceHandlers: UserServiceHandlers = {
   CreateUser: (call, callback) => {
-    console.log('CreateUser', call.request)
-    callback(null, { userId: randomUUID(), name: call.request.name })
+    createUser(call.request)
+    .then(user => callback(null, user))
+    .catch(error => callback(error))
   }
 }
 

@@ -9,7 +9,7 @@ message CreateUserRequest {
 message CreateUserResponse {
   string user_id = 1;
   string name = 2;
-  int64 created_at = 3;
+  float created_at = 3;
 }
 
 service UserService {
