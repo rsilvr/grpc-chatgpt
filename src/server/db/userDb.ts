@@ -25,3 +25,7 @@ export const saveUser = async(user: User): Promise<User> => {
   await UserEntity.put(user)
   return user
 }
+
+export const getUser = async(userId: string): Promise<User> => {
+  return UserEntity.get({ userId }).then(({ Item }) => Item as User)
+}

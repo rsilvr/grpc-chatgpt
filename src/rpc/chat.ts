@@ -9,7 +9,9 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 
 export interface ProtoGrpcType {
   chat: {
+    AssistantMessageErrorResponse: MessageTypeDefinition
     AssistantMessageResponse: MessageTypeDefinition
+    AssistantMessageSuccessResponse: MessageTypeDefinition
     ChatMessage: MessageTypeDefinition
     ChatResult: MessageTypeDefinition
     ChatService: SubtypeConstructor<typeof grpc.Client, _chat_ChatServiceClient> & { service: _chat_ChatServiceDefinition }

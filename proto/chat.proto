@@ -5,14 +5,26 @@ package chat;
 message UserMessageRequest {
   string user_id = 1;
   string message_text = 2;
-  optional string chat_id = 3;
+  string chat_id = 3;
 }
 
-message AssistantMessageResponse {
+message AssistantMessageSuccessResponse {
   string user_id = 1;
   string chat_id = 2;
   string message_id = 3;
   string message_chunk = 4;
+}
+
+message AssistantMessageErrorResponse {
+  string error_message = 1;
+  int32 error_code = 2;
+}
+
+message AssistantMessageResponse {
+  oneof response {
+    AssistantMessageSuccessResponse success = 1;
+    AssistantMessageErrorResponse error = 2;
+  }
 }
 
 message GetChatRequest {
