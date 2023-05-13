@@ -1,9 +1,14 @@
+export const enum MessageType {
+  user = 'user',
+  assistant = 'assistant'
+}
+
 export interface Message {
   chatId: string
   messageId: string
   userId: string
   messageText: string
-  sentAt: number
+  messageType: MessageType
   startedAt: number
   finishedAt: number
 }
