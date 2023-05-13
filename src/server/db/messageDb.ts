@@ -29,3 +29,8 @@ const MessageEntity = new Entity({
 export const saveMessage = async (message: Message): Promise<Message> => {
   return MessageEntity.put(message).then(() => message)
 }
+
+export const retrieveSessionMessages = async (chatId: string): Promise<Message[]> => {
+  return MessageTable.query(chatId).then(({ Items }) => Items as Message[])
+  .then(messages => messages.sort((a, b) => a.startedAt - b.startedAt))
+} 

@@ -1,6 +1,7 @@
 export const enum MessageType {
   user = 'user',
-  assistant = 'assistant'
+  assistant = 'assistant',
+  system = 'system'
 }
 
 export interface Message {
