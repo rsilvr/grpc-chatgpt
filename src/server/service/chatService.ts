@@ -25,7 +25,15 @@ export const sendMessage = async (request: UserMessageRequest, call: ServerWrita
 }
 
 const streamAssistantAnswer = async (chatMessages: Message[], chatSession: ChatSession, call: ServerWritableStream<UserMessageRequest,AssistantMessageResponse>): Promise<void> => {
-  await getAnswer(chatMessages, async (chunk) => {
+  const assistantMessage: Message = {
+    chatId: chatSession.chatId,
+    userId: chatSession.userId,
+    messageId: randomUUID(),
+    messageText: '',
+    messageType: MessageType.assistant,
+    startedAt: Date.now(),
+  }
+  await getAnswer(chatMessages, (chunk) => {
     const response: AssistantMessageResponse = {
       success: {
         userId: chatSession.userId,
@@ -34,8 +42,12 @@ const streamAssistantAnswer = async (chatMessages: Message[], chatSession: ChatS
         messageChunk: chunk.chunkText,
       }
     }
+    assistantMessage.messageId = chunk.messageId
+    assistantMessage.messageText += chunk.chunkText
     call.write(response)
   })
+  assistantMessage.finishedAt = Date.now()
+  await saveMessage(assistantMessage)
 }
 
 const createOrGetChatSession = async (chatId: string | undefined, user: User): Promise<ChatSession> => {

@@ -11,7 +11,7 @@ export interface Message {
   messageText: string
   messageType: MessageType
   startedAt: number
-  finishedAt: number
+  finishedAt?: number
 }
 
 export interface ChatSession {

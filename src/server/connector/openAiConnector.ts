@@ -29,7 +29,7 @@ interface AnswerChunk {
   chunkText: string
 }
 
-type AnswerChunkHandler = (chunk: AnswerChunk) => Promise<void>
+type AnswerChunkHandler = (chunk: AnswerChunk) => void
 
 dotenv.config()
 
@@ -50,9 +50,10 @@ export const getAnswer = async (chatMessages: Message[], onChunkReceived: Answer
       stream: true
     }, { responseType: 'stream' })
     const stream = response.data as any
-    stream.on('data', async (data: Buffer) => {
+    stream.on('data', (data: Buffer) => {
       const fullContent = data.toString()
-      await onChunkReceived(formatAndFlatAnswerChunks(fullContent))
+      const chunk = formatAndFlatAnswerChunks(fullContent)
+      if (chunk) onChunkReceived(chunk)
     })
     stream.on('error', (error: any) => {
       console.log(inspect({ error }, { depth: null, colors: true, compact: false }))
@@ -62,8 +63,8 @@ export const getAnswer = async (chatMessages: Message[], onChunkReceived: Answer
   })
 }
 
-const formatAndFlatAnswerChunks = (fullChunkContent: string): AnswerChunk => {
-  return fullChunkContent.split('data:')
+const formatAndFlatAnswerChunks = (fullChunkContent: string): AnswerChunk | undefined => {
+  const formattedChunk = fullChunkContent.split('data:')
   .map(str => str.replace('[DONE]', '')
   .replaceAll(/\n/gi, '').trim())
   .filter(str => str.length > 0)
@@ -78,4 +79,5 @@ const formatAndFlatAnswerChunks = (fullChunkContent: string): AnswerChunk => {
     acc.chunkText += chunk.choices[0].delta.content!
     return acc
   }, { chunkText: '' } as AnswerChunk)
+  return formattedChunk.chunkText.length > 0 ? formattedChunk : undefined
 }
