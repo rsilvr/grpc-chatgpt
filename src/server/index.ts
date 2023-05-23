@@ -1,5 +1,6 @@
 import { Server, ServerCredentials, loadPackageDefinition } from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
+import * as fs from 'fs'
 import wrapServerWithReflection from 'grpc-node-server-reflection'
 import { join } from 'path'
 import { ProtoGrpcType as ChatServiceDefinition } from '../rpc/chat'
@@ -38,10 +39,17 @@ const chatServiceHandlers: ChatServiceHandlers = {
 }
 
 const server = wrapServerWithReflection(new Server())
+const credentials = ServerCredentials.createSsl(
+  fs.readFileSync('./certificates/ca.crt'), 
+  [{
+    cert_chain: fs.readFileSync('./certificates/server.crt'),
+    private_key: fs.readFileSync('./certificates/server.key')
+  }]
+)
 server.addService(userServiceDefinition.user.UserService.service, userServiceHandlers)
 server.addService(chatServiceDefinition.chat.ChatService.service, chatServiceHandlers)
 
-server.bindAsync('0.0.0.0:4000', ServerCredentials.createInsecure(), () => {
+server.bindAsync('0.0.0.0:4000', credentials, () => {
   server.start()
   console.log('server is running on 0.0.0.0:4000')
 })
