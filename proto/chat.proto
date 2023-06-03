@@ -45,9 +45,8 @@ message ChatMessage {
 }
 
 message ChatResult {
-  string user_id = 1;
-  string chat_id = 2;
-  repeated ChatMessage messages = 3;
+  string chat_id = 1;
+  repeated ChatMessage messages = 2;
 }
 
 service ChatService {

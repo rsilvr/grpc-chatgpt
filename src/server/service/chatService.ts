@@ -6,7 +6,10 @@ import { randomUUID } from 'crypto'
 import { join } from 'path'
 import { ProtoGrpcType as ChatServiceDefinition } from '../../rpc/chat'
 import { AssistantMessageResponse } from '../../rpc/chat/AssistantMessageResponse'
+import { ChatResult } from '../../rpc/chat/ChatResult'
 import { ChatServiceHandlers } from '../../rpc/chat/ChatService'
+import { GetChatRequest } from '../../rpc/chat/GetChatRequest'
+import { MessageRole } from '../../rpc/chat/MessageRole'
 import { UserMessageRequest } from '../../rpc/chat/UserMessageRequest'
 import { getAnswer } from '../connector/openAiConnector'
 import { getChatSession, saveChatSession } from '../db/chatDb'
@@ -23,7 +26,10 @@ const chatServiceDefinition = loadPackageDefinition(chatPackage) as unknown as C
 
 const chatServiceHandlers: ChatServiceHandlers = {
   GetChat: (call, callback) => {
-
+    authenticate(call)
+    .then(() => getChat(call.request))
+    .then(res => callback(null, res))
+    .catch(error => callback(error))
   },
   SendMessage: (call) => {
     authenticate(call)
@@ -33,6 +39,21 @@ const chatServiceHandlers: ChatServiceHandlers = {
       call.write({ error: { errorMessage: error.message, errorCode: error.code } })
       call.end()
     })
+  }
+}
+
+const getChat = async (request: GetChatRequest): Promise<ChatResult> => {
+  checkRequired(request, ['chatId'])
+  const chatMessages = await retrieveSessionMessages(request.chatId!)
+  if (!chatMessages.length) throw new ApiError('Chat not found', Status.NOT_FOUND)
+  return {
+    chatId: request.chatId,
+    messages: chatMessages.filter(message => message.messageType !== MessageType.system).map(message => ({
+      messageId: message.messageId,
+      messageText: message.messageText,
+      role: message.messageType === MessageType.user ? MessageRole.USER : MessageRole.ASSISTANT,
+      sentAt: message.startedAt
+    }))
   }
 }
 
