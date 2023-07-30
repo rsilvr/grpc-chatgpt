@@ -41,7 +41,7 @@ message ChatMessage {
   string message_id = 1;
   MessageRole role = 2;
   string message_text = 3;
-  int64 sent_at = 4;
+  float sent_at = 4;
 }
 
 message ChatResult {

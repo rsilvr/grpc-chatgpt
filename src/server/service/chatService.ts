@@ -19,24 +19,26 @@ import { ApiError } from '../types/apiError'
 import { ChatSession, Message, MessageType } from '../types/chatTypes'
 import { User } from '../types/userTypes'
 import { authenticate } from './authService'
-import { checkRequired } from './utils'
+import { checkRequired, logError, logRequest, logResponse } from './utils'
 
 const chatPackage = protoLoader.loadSync(join(__dirname, '../../../proto/chat.proto'))
 const chatServiceDefinition = loadPackageDefinition(chatPackage) as unknown as ChatServiceDefinition
 
 const chatServiceHandlers: ChatServiceHandlers = {
   GetChat: (call, callback) => {
+    logRequest('GetChat', call)
     authenticate(call)
     .then(() => getChat(call.request))
-    .then(res => callback(null, res))
-    .catch(error => callback(error))
+    .then(res => callback(null, logResponse('GetChat', res)))
+    .catch(error => callback(logError('GetChat', error)))
   },
   SendMessage: (call) => {
+    logRequest('SendMessage', call)
     authenticate(call)
     .then(() => sendMessage(call.request, call))
     .then(() => call.end())
     .catch(error => {
-      call.write({ error: { errorMessage: error.message, errorCode: error.code } })
+      call.write(logError('SendMessage', { error: { errorMessage: error.message, errorCode: error.code } }))
       call.end()
     })
   }
