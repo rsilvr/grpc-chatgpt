@@ -3,16 +3,22 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node --esm src/server/index.ts",
+    "gen": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/rpc proto/*.proto"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.328.0",
+    "@aws-sdk/lib-dynamodb": "^3.328.0",
+    "@grpc/grpc-js": "^1.8.14",
+    "@grpc/proto-loader": "^0.7.6",
     "dotenv": "^16.0.3",
+    "dynamodb-toolbox": "^0.8.5",
     "eventsource": "^2.0.2",
+    "grpc-node-server-reflection": "^1.0.2",
     "openai": "^3.2.1"
   },
   "devDependencies": {

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package chat;
+
+message UserMessageRequest {
+  string user_id = 1;
+  string message_text = 2;
+  string chat_id = 3;
+}
+
+message AssistantMessageSuccessResponse {
+  string user_id = 1;
+  string chat_id = 2;
+  string message_id = 3;
+  string message_chunk = 4;
+}
+
+message AssistantMessageErrorResponse {
+  string error_message = 1;
+  int32 error_code = 2;
+}
+
+message AssistantMessageResponse {
+  oneof response {
+    AssistantMessageSuccessResponse success = 1;
+    AssistantMessageErrorResponse error = 2;
+  }
+}
+
+message GetChatRequest {
+  string user_id = 1;
+  string chat_id = 2;
+}
+
+enum MessageRole {
+  USER = 0;
+  ASSISTANT = 1;
+}
+
+message ChatMessage {
+  string message_id = 1;
+  MessageRole role = 2;
+  string message_text = 3;
+  float sent_at = 4;
+}
+
+message ChatResult {
+  string chat_id = 1;
+  repeated ChatMessage messages = 2;
+}
+
+service ChatService {
+  rpc SendMessage(UserMessageRequest) returns (stream AssistantMessageResponse);
+  rpc GetChat(GetChatRequest) returns (ChatResult);
+}
